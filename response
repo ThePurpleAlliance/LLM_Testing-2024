@@ -1,0 +1,409 @@
+It is still technically summer as far as CD is concerned which means it is time for one more (very dumb) project.
+
+I have asked 5 LLMs to strategize, design and program robots for Crescendo. The purpose of this test is to asses weather or not they were trained on relevant data for FRC use. Obviously no one should actually be doing this or be exempt from using their own squishy brains to solve problems, but these are real tools that get used and perhaps it is an opportunity to teach ethical use. Note that this usecase is not realistically practical anyway as models take time to train.
+
+[details="Anyway, all 5 LLMs were asked the same 3 questions in succession:"]
+1. You have been tasked with designing a robot for the 2024 FIRST Robotics Competition game: Crescendo. To begin, explain the strategy that you will approach the game with, indicating specific objectives to accomplish. It is not possible to do everything, therefore, aim for a maximum of 3 objectives. Be specific about which tasks within the game you intend to accomplish.
+2. Next, design the subsystems that will be needed to accomplish the tasks that you have selected. Describe the general mechanical design of these systems and explain your choice of actuator (if present) for each one.
+3. Finally, write the necessary Java code to operate the subsystems you have described previously using the WPILib framework. You may use additional vendor libraries as needed.
+[/details]
+
+The five models tested are GPT-4, Sonnet 3.5, Llama 3.1, Flash 1.5 and Mistral Large.
+
+### Microsoft/OpenAI Copilot (GPT-4)
+1. Copilot comes up with some decent steps to take, but is unable to provide specifics as to what its exact game strategy is.
+2. It clearly has no information on the game. Did manage to describe the most generic FRC robot though. Not sure where it got chassis height adjustment.
+3. The use of PWMSparkMax is highly indicative that Copilot has been trained on WPILib Docs. It made a *start* on swerve modules, but does not have a full swerve subsystem. Command declarations were not made in the subsystems. Some parts are just not done.
+
+[details="output"]
+Alright, let’s orchestrate our strategy for Crescendo with a crescendo of objectives! 🎶 Here are the three key tasks to focus on:
+
+1. **Efficient Scoring Mechanism**:
+   - **Objective**: Design a robot with a specialized scoring mechanism to quickly and accurately place game pieces in designated scoring areas.
+   - **Tasks**: Develop a robust mechanism for picking up, holding, and precisely placing game pieces. Aim for a high-speed intake system and a reliable shooter or placer that can handle various game piece shapes and sizes.
+
+2. **Autonomous Period Mastery**:
+   - **Objective**: Optimize autonomous operations for maximum point accumulation in the game's autonomous period.
+   - **Tasks**: Program multiple autonomous routines to handle different starting positions and game scenarios. Focus on consistency and reliability, ensuring the robot can score autonomously without human intervention.
+
+3. **Adaptability and Maneuverability**:
+   - **Objective**: Ensure the robot can navigate the playing field efficiently, adapting to different game scenarios and opponent strategies.
+   - **Tasks**: Equip the robot with a versatile drivetrain for swift and agile movements. Implement sensors and software for obstacle detection, real-time path adjustment, and strategic movements to avoid defense and find optimal scoring opportunities.
+
+These objectives will help the robot excel in scoring, autonomy, and navigation, giving it a competitive edge while avoiding over-complication. Ready to dive into the details of each component? 🌟
+***
+
+Alright, let’s break down the three subsystems required for our objectives in the 2024 FIRST Robotics Competition game, Crescendo:
+
+### 1. Scoring Mechanism
+
+#### Mechanical Design:
+- **Intake System**: A versatile roller system with compliant wheels that can adjust to various game piece shapes and sizes.
+- **Storage**: A conveyor belt or hopper system to transport game pieces from the intake to the shooter/placer.
+- **Shooter/Placer**: A linear actuator or rotary arm to precisely place game pieces in the scoring areas.
+
+#### Choice of Actuators:
+- **Roller Intake**: Powered by brushless DC motors (e.g., NEO or Falcon 500) for high torque and speed control.
+- **Conveyor Belt**: Driven by smaller DC motors or servo motors to ensure precise control over game piece movement.
+- **Shooter/Placer**: Utilizes linear actuators for precise placement, ensuring consistent and accurate scoring.
+
+### 2. Autonomous Operations
+
+#### Mechanical Design:
+- **Sensors**: A combination of vision systems (cameras), ultrasonic sensors, and encoders to provide feedback for accurate navigation.
+- **Control System**: A robust central processing unit (CPU) to handle real-time data and execute autonomous routines.
+
+#### Choice of Actuators:
+- **Drive Motors**: Brushless DC motors (e.g., NEO or Falcon 500) for smooth and reliable movement during autonomous operations.
+- **Sensor Integration**: Servo motors for fine adjustments based on sensor feedback, ensuring precise movements and actions.
+
+### 3. Mobility and Adaptability
+
+#### Mechanical Design:
+- **Drivetrain**: A swerve drive system for omnidirectional movement, providing excellent maneuverability and adaptability to different game scenarios.
+- **Chassis**: Lightweight and robust to handle the demands of the competition while ensuring agility.
+
+#### Choice of Actuators:
+- **Swerve Modules**: Each module powered by a pair of brushless DC motors—one for driving and one for steering—to achieve smooth, omnidirectional movement.
+- **Chassis Adjustment**: Servo motors for adjusting robot height or configuration based on in-game requirements.
+
+By focusing on these subsystems and carefully selecting the actuators, we can create a competitive and versatile robot for Crescendo. Each subsystem is designed to fulfill our strategic objectives effectively, ensuring the robot excels in scoring, autonomy, and navigation. Shall we delve deeper into any specific subsystem? 🚀🤖
+
+[/details]
+
+
+
+***
+***
+### Anthropic Claude (3.5 Sonnet)
+1. Claude came up with detailed strategy and reasoning for it. This is very specific, was it trained on CD at all? Not sure the assessment on complexity of Amp vs Speaker is correct.
+2. Did not come up with under bumper intake. Is listing real motors in reasonable uses. The pneumatic tyres are unusual, not sure where it got that from. It listed control system components, but does not seem to know that Limelight is a coprocessor or that RPis are not optimal in that role.
+3. Starts with RobotContainer first. Using Rev API directly. Did create commands. Not sure about how an upper limit switch on the climber works, but it could be hall effect. Claude correctly inverted the limit switch value.
+
+[details="output"]
+Let me outline a focused strategy for the 2024 FRC Crescendo game. I'll analyze the game elements and propose specific objectives that balance scoring potential with mechanical complexity.
+
+Strategic Objectives:
+
+1. Amp Scoring Specialist - Floor Note Pickup
+- Focus on rapid collection of notes from the floor using a low, wide intake system
+- Consistently deliver notes to the amp for 2 points each
+- This is a relatively lower-difficulty scoring method compared to speaker shots
+- Position robot primarily in the amp side of the field for quick scoring cycles
+- Target scoring 5-6 notes per match through the amp (10-12 points)
+
+2. Stage Climbing - Main Endgame Focus
+- Design a robust climbing mechanism to reach the chain level on the stage
+- Aim to consistently score 4 points for a basic hang
+- The climbing mechanism should be simple and reliable rather than trying for more complex arrangements
+- Begin positioning for the climb with 20-30 seconds remaining in the match
+
+3. Note Starting Position Automation
+- Develop reliable autonomous routines to score preloaded notes
+- Focus on collecting and scoring 1-2 additional notes during auto
+- Target 6-8 points during autonomous (2 notes scored + mobility)
+- This provides a strong early lead while being mechanically achievable
+
+Notably, this strategy intentionally avoids:
+- Speaker scoring (which requires more complex shooting mechanisms)
+- Trap scoring (which requires precise endgame manipulation)
+- Harmony climbing (which adds significant mechanical complexity)
+
+Would you like me to elaborate on any of these objectives or explain why certain game elements were excluded from the strategy?
+***
+I'll break down each major subsystem needed for our strategic objectives:
+
+1. Floor Intake System
+- Wide, roller-based intake (~24" wide) using compliant wheels or surgical tubing
+- Single 775pro motor or NEO 550 driving the main roller
+- Polycarbonate side guides to help funnel notes into the intake
+- Spring-loaded hinged mounting to absorb impact when collecting notes
+- Uses pneumatic actuator to deploy/retract the intake to stay within frame perimeter
+Rationale: A wide intake increases collection reliability, while the compliant wheels provide good grip on notes. The pneumatic deployment allows for quick actuation and mechanical simplicity.
+
+2. Note Transport/Conveyor
+- Vertical conveyor system using timing belts with note-gripping cleats
+- Driven by single NEO motor with reduction (likely 5:1 or 7:1)
+- Polycarbonate guide channels to maintain note orientation
+- Proximity sensor at top to detect successful note transport
+Rationale: Timing belts with cleats provide positive control of the note during transport. The NEO offers good speed control and enough torque through reduction.
+
+3. Amp Delivery System
+- Fixed angle ejection point positioned for amp height
+- Powered roller (NEO 550) to provide consistent ejection speed
+- Short guide rails to maintain note orientation during ejection
+Rationale: Since the amp height is fixed, we can optimize a single release point rather than building a complex adjustable mechanism.
+
+4. Climbing Mechanism
+- Two-stage telescoping arm system using 80/20 aluminum extrusion
+- Primary extension driven by dual NEO motors with chain/cable drive
+- Self-locking worm gear reduction (~70:1) to maintain position when powered off
+- Hook end effector designed specifically for chain engagement
+- Limit switches to prevent over-extension
+Rationale: The telescoping design provides necessary reach while staying compact. Worm gear reduction prevents back-driving when hanging, and dual motors provide redundancy.
+
+5. Drive Train
+- 6-wheel tank drive with center drop
+- Four NEO motors (two per side)
+- 6" pneumatic wheels for better traction and bump traversal
+- ~8:1 overall reduction for balance of speed and control
+- High-strength steel chassis frame tubes (2"x1")
+Rationale: Tank drive offers good pushing power and simplicity. Center drop helps with stability and turning. Pneumatic wheels help absorb shock when collecting notes or traversing field elements.
+
+Additional Control Elements:
+- Raspberry Pi coprocessor for vision processing
+- Limelight camera for note detection and alignment
+- Multiple beam break sensors for note tracking through system
+- REV PDH for power distribution
+- Pneumatics Hub for intake actuation
+
+Would you like me to elaborate on any of these subsystems or discuss specific component choices in more detail?
+***
+[/details]
+
+
+***
+***
+### Meta Meta AI (Llama 3.1
+1. Llama seems to go from the perspective that it is part of the team. It clearly does not have any specific information on the game. Guessing Ball is likely to be correct statistically, though. Have no idea what node engagement and rotation means.
+2. It did come up with real mechanisms, for a ball. Specified actual relevant shooter and intake. The drivetrain is tank and has four wheels. It might be mixing NODES and CONTROL PANEL. The motors are real, but the use of miniCIM and Falcon for light tasks exclusively is strange. roboRIO mentioned.
+3. RobotContainer is first. Subsystems do not extend SubsystemBase and have control bindings inside. There are no commands. VictorSPX was chosen which would contradict the NEO and Falcon options.
+
+[details="output"]
+2024 FIRST Robotics Competition Game: Crescendo Strategy
+After analyzing the game rules and objectives, our team has decided to focus on the following three primary objectives to maximize our scoring potential:
+Objective 1: Consistent High-Goal Shooting
+Design a robot with a reliable and accurate shooting mechanism capable of scoring points in the high goal (4 points each).
+Develop a control system that allows for precise aiming and shooting from various distances and angles.
+Implement a feeder system to quickly reload and prepare the next ball for shooting.
+Objective 2: Efficient Game Piece Collection and Stacking
+Design a robot with a versatile collection system that can pick up game pieces (balls) from the floor and transport them to the shooting mechanism or storage.
+Develop a stacking mechanism that allows the robot to store and manage multiple game pieces, enabling efficient reloading and minimizing waste.
+Implement a sensor system to detect and respond to game piece availability and robot capacity.
+Objective 3: Reliable Node Engagement and Rotation
+Design a robot with a mechanism to engage and rotate the nodes (4 points each) in a consistent and controlled manner.
+Develop a system to detect and respond to node orientation and rotation, ensuring accurate and efficient engagement.
+Implement a strategy to prioritize node engagement and rotation based on game state and scoring opportunities.
+By focusing on these three objectives, our robot will be well-rounded and capable of scoring points through high-goal shooting, game piece collection and stacking, and node engagement and rotation. This strategy will allow us to adapt to various game scenarios and maximize our scoring potential.
+***
+Subsystem Design for Crescendo Robot
+To accomplish the selected tasks, we will design the following subsystems:
+1. Shooting Mechanism Subsystem
+General Mechanical Design: The shooting mechanism will consist of a hooded shooter with a flywheel-based launching system. The hood will be designed to adjust its angle to accommodate different shooting distances and angles.
+Actuator: We will use a high-torque, high-speed motor (e.g., CIM or NEO) to drive the flywheel. This will provide the necessary power and speed to launch the balls into the high goal.
+Additional Components: A feeder system will be designed to supply balls to the shooter, and a sensor will be used to detect the presence of a ball and trigger the shooting sequence.
+2. Game Piece Collection and Stacking Subsystem
+General Mechanical Design: The collection system will feature a wide, curved intake with compliant wheels or a conveyor belt to pick up balls from the floor. The intake will be designed to be low to the ground and have a large capacity to collect multiple balls at once.
+Actuator: We will use a motor (e.g., MiniCIM or Falcon 500) to drive the intake wheels or conveyor belt. This will provide the necessary power to collect and transport the balls.
+Additional Components: A sensor will be used to detect the presence of balls in the intake, and a pneumatic or motorized system will be designed to manage the stacking of balls in the storage area.
+3. Node Engagement and Rotation Subsystem
+General Mechanical Design: The node engagement system will feature a pivoting or sliding mechanism with a compliant, rubberized wheel or gripper to engage and rotate the nodes.
+Actuator: We will use a motor (e.g., MiniCIM or Falcon 500) to drive the pivoting or sliding mechanism, and a separate motor or pneumatic system to drive the wheel or gripper.
+Additional Components: A sensor will be used to detect the node's orientation and rotation, and a control system will be designed to adjust the engagement and rotation speed based on the game state.
+4. Mobility Subsystem
+General Mechanical Design: The mobility system will feature a differential drive with four wheels, providing stability and maneuverability on the field.
+Actuator: We will use high-torque, high-speed motors (e.g., CIM or NEO) to drive the wheels, providing the necessary power and speed to move around the field.
+Additional Components: A gyro sensor will be used to maintain the robot's orientation, and a control system will be designed to adjust the speed and direction based on the game state.
+5. Control and Sensor Subsystem
+General Mechanical Design: The control and sensor system will feature a roboRIO or similar control system, with various sensors (e.g., ultrasonic, infrared, and limit switches) to detect the robot's surroundings, game pieces, and nodes.
+Actuator: N/A
+Additional Components: A human-machine interface (HMI) will be designed to provide feedback to the drivers and display important game information.
+By designing these subsystems, we will be able to accomplish the selected tasks and create a well-rounded robot capable of competing in the Crescendo game.
+***
+
+[/details]
+
+
+***
+***
+### Google Gemini (1.5 Flash)
+1. Gemini named its strategy; this should become and actual requirement when talking to judges. A definite focus on the amp although the active defence seems illegal in this case. Called it maximizing cycle time, but got the details right for minimization.
+2. Shooting into the amp, with an adjustable hood. It seems to have conflated intake with human player collection. It gave the TLA "HPS" to Human Player Station - this is not actually used as far as I am aware. The motors suggested are the "CIMcoder" and the NE553 which as far as I can tell is a [55kW AC motor](https://industrialmatrix.com/motor/generalelectric-n553). *All* the drive systems are suggested. 4-6 NE20 motors are suggested for each swerve module. I could not find and NE20 motor, so we will assume that it means [this jet engine](https://en.wikipedia.org/wiki/Ishikawajima_Ne-20)
+3. All the code is done timed and no attempt was made to create RobotContainer. The blocking arm here has no sensors and is going to spin. Gemini put data on the dashboard.
+
+[details="output"]
+Game Strategy: "Amplified Defense"
+
+This strategy focuses on maximizing points by consistently scoring on the Amp while simultaneously disrupting the opposing alliance's scoring attempts.
+
+Objectives:
+
+1. Dominate the Amp:
+
+  * Task: Develop a highly reliable and efficient mechanism to consistently score Game Pieces (Notes) on the Amp. This may involve a combination of:
+    * Precise Aiming: Implement accurate sensors and control systems to ensure consistent and repeatable shots.
+    * High-Speed Scoring: Utilize fast-acting mechanisms to maximize the number of Notes scored within the allotted time.
+    * Strategic Placement: Develop a system to effectively position the robot for optimal scoring angles and to minimize interference from opposing robots.
+
+2. Disrupt Opponent's Amp Scoring:
+
+  * Task: Implement defensive mechanisms to hinder the opposing alliance's ability to score on the Amp. This could include:
+    * Active Defense: Employing mechanisms to block the opponent's shot paths or deflect their Game Pieces.
+    * Passive Defense: Strategic positioning to obstruct the opponent's line of sight or limit their access to scoring positions.
+    * Interference: Distracting the opponent's robot with controlled movements or by occupying key areas on the field.
+
+3. Maximize Cycle Time:
+
+  * Task: Optimize the robot's design and programming to minimize the time required to complete a full scoring cycle. This includes:
+    * Efficient Game Piece Acquisition: Developing a mechanism to quickly and reliably acquire Game Pieces from the Human Player Station.
+    * Rapid Movement: Utilizing a high-speed and maneuverable drive system to quickly traverse the field.
+    * Streamlined Scoring Actions: Minimizing the time required for each scoring attempt.
+
+Rationale:
+
+This strategy prioritizes consistent scoring on the Amp, a high-value scoring zone, while simultaneously hindering the opponent's ability to score. By effectively combining offensive and defensive capabilities, this approach aims to maximize the robot's contribution to the alliance's overall score and increase the likelihood of achieving victory.
+
+Note: This is a preliminary strategy. Further analysis, prototyping, and testing will be necessary to refine the design and optimize the robot's performance based on the specific rules, challenges, and observations made during the build season.
+
+***
+
+1. Amp Scoring Subsystem
+
+* Mechanical Design:
+
+  * Shooter: A flywheel system with two counter-rotating wheels to impart high velocity to the Notes.
+    * Consider a vertical or horizontal orientation based on field positioning and aiming constraints.
+    * Incorporate a hood or adjustable angle to control the trajectory of the Notes.
+  * Indexer: A mechanism to reliably feed Notes into the shooter wheels. This could involve:
+    * A single or multi-stage belt system.
+    * A piston-driven pusher.
+    * A combination of both.
+  * Intake: A mechanism to acquire Notes from the Human Player Station (HPS). This could involve:
+    * A rotating arm with a roller or intake wheel.
+    * A simple pickup mechanism utilizing gravity and robot movement.
+* Actuator Choice:
+
+  * Shooter Wheels: High-torque brushless motors (e.g., NE553) for high rotational speed and power.
+  * Indexer:
+    * Belts: Driven by smaller, high-speed brushless motors (e.g., CIMcoder).
+    * Pistons: Driven by pneumatic cylinders.
+  * Intake:
+    * Rotating arm: Driven by a brushless motor.
+    * Pickup mechanism: Driven by a combination of motors and possibly pneumatics.
+
+2. Amp Defense Subsystem
+
+* Mechanical Design:
+
+  * Blocking Arm: A deployable arm that can be positioned to obstruct the opponent's shot paths.
+    * Consider a telescoping or articulated design for flexibility.
+  * Game Piece Deflector: A mechanism to deflect incoming Notes. This could involve:
+    * A pivoting panel.
+    * A series of angled surfaces.
+* Actuator Choice:
+
+  * Blocking Arm:
+    * Telescoping: Driven by a linear actuator or a combination of pistons.
+    * Articulated: Driven by a combination of servos and possibly a small motor.
+  * Game Piece Deflector: Driven by a servo or a small pneumatic cylinder.
+
+3. Mobility Subsystem
+
+* Mechanical Design:
+
+    * Drivetrain: A 4-wheel or 6-wheel drive system (e.g., tank drive, mecanum drive, swerve drive).
+    * Choose the drivetrain type based on field constraints, maneuverability requirements, and desired level of complexity.
+    * Steering: Implement a robust steering system with encoders for precise control and odometry.
+    * Actuator Choice:
+
+  * Drivetrain: Four or six high-torque brushless motors (e.g., NE20) for each wheel.
+
+Note:
+
+* This is a high-level design. Detailed engineering drawings, calculations, and prototyping will be crucial for refining the design and optimizing performance.
+* Consider using CAD software (e.g., SolidWorks, Fusion 360) to create 3D models of the subsystems.
+* Thoroughly test each subsystem individually and as part of the complete robot to identify and address any issues.
+
+This design provides a solid foundation for the "Amplified Defense" strategy. By focusing on these key subsystems and iteratively improving their performance, the robot can effectively score on the Amp, disrupt the opponent, and maximize its contribution to the alliance's success.
+[/details]
+
+
+***
+***
+### Mistral AI Le Chat (Mistral Large)
+1. Mistral correctly identifies notes, but not the climbing. It seems to have vauge specific information on the game, but was likely trained on at least some general FRC information. It choses shooting. It specifies a blocking arm.
+2. Design details are reasonable, if somewhat vauge. Tank drive chosen. Brushless motors are specified for most things. It is not aware that stepper motors are illegal. Having a low profile is part of the design.
+3. Most motors were said to be brushless, but it is using VictorSPs. The DigitalInput is correctly inverted. The climber lacks any sensors. The drivetrain has two Sparks. Interesting that Mistral included tank controls. No RobotContainer, we are doing this timed. It calls CommandScheduler despite not having commands.
+
+[details="output"]
+To design a robot for the 2024 FIRST Robotics Competition game, Crescendo, we need to focus on a strategy that maximizes our scoring potential while ensuring reliability and efficiency. Given the constraints, we will prioritize the following three objectives:
+
+### 1. **Efficient Note Collection and Scoring**
+   - **Objective**: Design a robot that can quickly and efficiently collect notes (game pieces) from the field and score them in the designated scoring areas.
+   - **Tasks**:
+ 	- Develop a robust intake mechanism to collect notes from the floor and human players.
+ 	- Implement a precise and fast shooting mechanism to score notes in the high-value targets.
+ 	- Ensure the robot can navigate to and from the scoring areas quickly to maximize the number of notes scored.
+
+### 2. **Climbing and Endgame Strategy**
+   - **Objective**: Create a reliable climbing mechanism to reach the highest rung of the climbing structure during the endgame.
+   - **Tasks**:
+ 	- Design a climbing mechanism that can quickly and securely ascend the climbing structure.
+ 	- Ensure the robot can stabilize itself at the top to earn maximum endgame points.
+ 	- Practice and optimize the climbing sequence to minimize time and maximize points.
+
+### 3. **Defensive and Control Capabilities**
+   - **Objective**: Equip the robot with defensive capabilities to control the field and disrupt opponent strategies.
+   - **Tasks**:
+ 	- Incorporate a defensive mechanism, such as a blocking arm or a low-profile design, to prevent opponents from scoring.
+ 	- Develop a strategy for controlling key areas of the field, such as the loading zones or scoring areas.
+ 	- Train the drive team to effectively use the robot's defensive capabilities to gain a strategic advantage.
+
+### Rationale:
+- **Efficient Note Collection and Scoring**: This is the primary way to accumulate points throughout the match. A fast and accurate shooting mechanism will allow us to score consistently and build a lead.
+- **Climbing and Endgame Strategy**: The endgame climb is often a significant point multiplier. A reliable climbing mechanism ensures we can secure these points and potentially win close matches.
+- **Defensive and Control Capabilities**: Controlling the field and disrupting opponents can prevent them from scoring while allowing our alliance to maintain possession of key areas. This defensive strategy complements our offensive scoring capabilities.
+
+By focusing on these three objectives, we aim to create a well-rounded robot that can score efficiently, secure endgame points, and control the field defensively. This strategy balances offense and defense, maximizing our chances of success in the competition.
+***
+To accomplish the tasks selected for the 2024 FIRST Robotics Competition game, Crescendo, we need to design specific subsystems for our robot. Here are the subsystems required to achieve our objectives, along with their general mechanical design and choice of actuators:
+
+### 1. **Note Intake and Storage Subsystem**
+   - **Mechanical Design**:
+ 	- **Intake Mechanism**: A roller or conveyor belt system at the front of the robot to collect notes from the floor.
+ 	- **Storage**: A hopper or magazine to store collected notes before shooting.
+   - **Actuator Choice**:
+ 	- **Intake**: High-speed brushless DC motor with a gearbox to provide sufficient torque for picking up notes.
+ 	- **Storage**: A small DC motor or servo to manage the flow of notes into the shooting mechanism.
+
+### 2. **Shooting Subsystem**
+   - **Mechanical Design**:
+ 	- **Shooter**: A flywheel or catapult mechanism to launch notes into the scoring areas.
+ 	- **Aiming**: A turret or adjustable angle mechanism to aim the shooter accurately.
+   - **Actuator Choice**:
+ 	- **Flywheel**: High-speed brushless DC motor with a high gear ratio to achieve the necessary launch velocity.
+ 	- **Turret**: A servo or stepper motor for precise aiming control.
+
+### 3. **Climbing Subsystem**
+   - **Mechanical Design**:
+ 	- **Climbing Mechanism**: A hook or claw system to grasp the climbing structure, combined with a winch or linear actuator to lift the robot.
+ 	- **Stabilization**: A locking mechanism to secure the robot at the top of the climbing structure.
+   - **Actuator Choice**:
+ 	- **Winch**: A powerful DC motor with a high gear ratio to provide the torque needed for lifting the robot.
+ 	- **Linear Actuator**: A pneumatic or electric linear actuator for extending and retracting the climbing hook.
+
+### 4. **Defensive Subsystem**
+   - **Mechanical Design**:
+ 	- **Blocking Arm**: An extendable arm or barrier to block opponents from scoring.
+ 	- **Low-Profile Design**: A compact and low-profile chassis to navigate under obstacles and maintain control of key areas.
+   - **Actuator Choice**:
+ 	- **Blocking Arm**: A pneumatic cylinder or electric linear actuator for quick deployment and retraction.
+ 	- **Low-Profile Chassis**: No additional actuators needed; focus on lightweight and robust materials for the chassis.
+
+### 5. **Drive Train Subsystem**
+   - **Mechanical Design**:
+ 	- **Chassis**: A robust and lightweight frame to support all subsystems.
+ 	- **Wheels**: High-traction wheels for maneuverability and stability.
+   - **Actuator Choice**:
+ 	- **Drive Motors**: High-torque brushless DC motors with gearboxes for efficient and powerful movement.
+ 	- **Steering**: Differential drive or omni-wheels for precise control and agility.
+
+### Rationale:
+- **Note Intake and Storage Subsystem**: Ensures efficient collection and storage of notes, allowing for continuous scoring.
+- **Shooting Subsystem**: Provides accurate and powerful launching of notes into high-value scoring areas.
+- **Climbing Subsystem**: Enables the robot to secure endgame points by reaching the highest rung of the climbing structure.
+- **Defensive Subsystem**: Allows the robot to control the field and disrupt opponent strategies, enhancing our competitive edge.
+- **Drive Train Subsystem**: Provides the foundation for all other subsystems, ensuring the robot can navigate the field effectively.
+
+By integrating these subsystems, we create a robust and versatile robot capable of excelling in the 2024 FIRST Robotics Competition game, Crescendo.
+[/details]
